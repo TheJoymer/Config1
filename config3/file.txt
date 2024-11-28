@@ -1,0 +1,15 @@
+REM This is a one line comment
+--[[
+This is multiline
+comment
+]]
+set a = 8
+set vm = table(
+    IP => table(
+    memory => 1024,
+    )
+    memory => 1024,
+    mem => 1024,
+)
+set str = @"Flowers"
+set test = ${str}
