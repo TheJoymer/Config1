@@ -93,7 +93,7 @@ import sys, os
 
 py prac.py file.txt
 # Результат работы
-![изображение](https://github.com/user-attachments/assets/1849a512-b949-4cd5-85ea-6236df962822)
+![изображение](https://github.com/user-attachments/assets/8e006c52-c883-4cf4-b723-359e0e3f4394)
 
 
 
@@ -102,4 +102,4 @@ py prac.py file.txt
 
 Тесты были написаны вручную в файле test_prac.py
 Результат прогона тестов показл, что функции работают корректно
-![image](https://github.com/user-attachments/assets/4b1acc54-a9f8-4cfb-8901-73f22f411b16)
+![изображение](https://github.com/user-attachments/assets/2a8ba2a4-cdbe-4d71-b2a0-bda8e2eaeff5)
