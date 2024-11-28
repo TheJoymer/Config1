@@ -1,0 +1,7 @@
+digraph G {
+  "commit (initial) 2024-11-28 03:19 Gleb" -> "commit 2024-11-28 03:19 Gleb";
+  "commit 2024-11-28 03:19 Gleb" -> "merge firbranch 2024-11-28 03:20 Gleb";
+  "commit 2024-11-28 03:20 Gleb" -> "merge firbranch 2024-11-28 03:20 Gleb";
+  "commit 2024-11-28 03:19 Gleb" -> "commit 2024-11-28 03:20 Gleb";
+  "commit 2024-11-28 03:20 Gleb" -> "commit 2024-11-28 03:20 Gleb";
+}
