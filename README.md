@@ -2,7 +2,6 @@
 # Цель работы
 Разработать свой небольшой эмулятор.
 # Постановка задач
-Вариант №2
 
 Задание №2
 
@@ -52,8 +51,9 @@ import sys, os
 
 py zadan.py dot C:/Users/Bileb/Desktop/work/.git output.dot master
 # Результат работы
-![image](https://github.com/user-attachments/assets/77e5c3cd-116b-4676-8fa8-bc264b0ee76f)
-![image](https://github.com/user-attachments/assets/66b4b0a7-a49c-4271-b67e-b4aca1e82243)
+![изображение](https://github.com/user-attachments/assets/c17acc62-9d86-4b6e-b7de-8177c0c157cb)
+![изображение](https://github.com/user-attachments/assets/186ee585-ed5c-4c01-b286-53fdceb26605)
+
 
 
 
