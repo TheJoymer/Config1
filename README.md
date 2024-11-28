@@ -3,7 +3,6 @@
 Разработать инструмент командной строки для учебного конфигурационного
 языка, синтаксис которого приведен далее.
 # Постановка задач
-Вариант №2
 
 Задание №3
 
@@ -94,7 +93,8 @@ import sys, os
 
 py prac.py file.txt
 # Результат работы
-![image](https://github.com/user-attachments/assets/25d231c5-45e3-4c8d-bcbf-175f0a31c021)
+![изображение](https://github.com/user-attachments/assets/1849a512-b949-4cd5-85ea-6236df962822)
+
 
 
 
