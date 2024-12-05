@@ -1,17 +1,27 @@
 import datetime
 import sys, os
 
-def svaz(slovs, vetka: str):
-    # создание массива зависимостей текущего к следующему
+def svaz(slovs, vetka: str, visited=None):
+    # Используем множество, чтобы отслеживать уже обработанные узлы
+    if visited is None:
+        visited = set()
+
+    # Проверяем, не обрабатывали ли уже эту ветку
+    if vetka in visited:
+        return []  # Если уже обработана, возвращаем пустой список
+
+    visited.add(vetka)  # Помечаем текущую ветку как посещённую
+
+    # Создание массива зависимостей
     deps = []
     p = 0
     if slovs[vetka][0]["whot"] != "commit (initial)":
         if "merge" in slovs[vetka][0]["whot"]:
             link = (slovs[vetka][0], slovs[vetka][1])
             deps.append(link)
-        # возможно ненужный код
-        for ii in svaz(slovs, slovs[vetka][0]["line"]):
+        for ii in svaz(slovs, slovs[vetka][0]["line"], visited):
             deps.append(ii)
+
     for i in range(p, len(slovs[vetka]) - 1):
         if slovs[vetka][i]["whot"] == "commit" or slovs[vetka][i]["whot"] == "commit (initial)":
             link = (slovs[vetka][i], slovs[vetka][i+1])
@@ -21,9 +31,9 @@ def svaz(slovs, vetka: str):
                 link = (slovs[st][-1], slovs[vetka][i+1])
                 deps.append(link)
                 if len(slovs[st]) != 1:
-                    for ii in svaz(slovs, st):
+                    for ii in svaz(slovs, st, visited):
                         deps.append(ii)
-        if "rebase" in slovs[vetka][i]["whot"] or "merge" in slovs[vetka][i+1]["whot"]:
+        if "rebase" in slovs[vetka][i+1]["whot"]:
             link = (slovs[vetka][i], slovs[vetka][i+1])
             deps.append(link)
             if "merge" in slovs[vetka][i+1]["whot"]:
@@ -31,35 +41,36 @@ def svaz(slovs, vetka: str):
                 link = (slovs[vetka][i+1], slovs[st][-1])
                 deps.append(link)
                 if len(slovs[st]) != 1:
-                    for ii in svaz(slovs, st):
+                    for ii in svaz(slovs, st, visited):
                         deps.append(ii)
+
     return deps
 
 
+
 def fetch_apk_dependencies(package_name: str, vetka: str):
-    """Получение коммитов из файла гита HEAD"""
-    file_list = os.listdir(package_name + '\\logs\\refs\\heads')
+    file_list = os.listdir(package_name + '/logs/refs/heads')
     tekush = "master"
     prosh = ""
     slovs = {}
     for i in file_list:
         slovs[i] = []
-    head_file = package_name + '\\logs\\HEAD'
-    with open(head_file, 'r') as log_file:
+    head_file = package_name + '/logs/HEAD'
+    with open(head_file, 'r', encoding='utf-8') as log_file:
         for line in log_file:
             spl_line = line.split(" ")
             if spl_line[5][6:] == "commit":
-                slovs[tekush].append({"whot": "commit (initial)", "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M"), "who": spl_line[2], "line": tekush})
+                slovs[tekush].append({"whot": "commit (initial)", "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M:%S"), "who": spl_line[2], "line": tekush})
             else:
                 if spl_line[5][6:] == "commit:":
-                    slovs[tekush].append({"whot": "commit", "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M"), "who": spl_line[2], "line": tekush})
+                    slovs[tekush].append({"whot": "commit", "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M:%S"), "who": spl_line[2], "line": tekush})
                 elif spl_line[5][6:] == "checkout:":
                     prosh = spl_line[-3]
                     tekush = spl_line[-1][:-1]
                     if slovs[tekush] == []:
                         slovs[tekush].append(slovs[prosh][-1])
                 elif spl_line[5][6:] == "merge":
-                    slovs[tekush].append({"whot": "merge" + " " + spl_line[6][:-1], "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M"), "who": spl_line[2], "line": tekush})
+                    slovs[tekush].append({"whot": "merge" + " " + spl_line[6][:-1], "when": datetime.datetime.fromtimestamp(int(spl_line[4])).strftime("%Y-%m-%d %H:%M:%S"), "who": spl_line[2], "line": tekush})
                 elif spl_line[5][6:] == "rebase" and spl_line[6] == "(start):":
                     p = 0
                     for i in slovs[spl_line[-1][:-1]]:
@@ -67,6 +78,8 @@ def fetch_apk_dependencies(package_name: str, vetka: str):
                             slovs[tekush].append(i)
                         if slovs[tekush][0] == i:
                             p = 1
+
+    print(slovs)
     deps = svaz(slovs, vetka)
     return deps
 
@@ -77,6 +90,7 @@ def build_graphviz(deps):
     
     added_links = set()  
     # Создаём множество для хранения добавленных связей, чтобы избежать дублирования.
+
     for src, dest in deps:  
         # Проходим по каждой паре зависимостей (источник, назначение).
         
@@ -98,7 +112,8 @@ def build_graphviz(deps):
     return graphviz_code  # Возвращаем строку с кодом Graphviz.
 
 def main():
-    if len(sys.argv) != 5:  
+    print(0)
+    if len(sys.argv) != 5:      
         # Проверяем, что было передано ровно 4 аргумента: путь к программе для визуализации графов имя пакета и путь к файлу для записи результатов.
         
         print("Использование: python zadan.py <visualizer_path> <package_name> <output_path>")  
@@ -138,5 +153,5 @@ def main():
     # "dot" -Tsvg output.dot > output.svg
     os.system(f'\"{visializer_path}\" -Tsvg {output_path} > {output_path.split(".")[0] + ".svg"}')
 
-if __name__ == "main":
+if __name__ == "__main__":
     main() 
