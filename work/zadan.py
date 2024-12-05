@@ -1,27 +1,17 @@
 import datetime
 import sys, os
 
-def svaz(slovs, vetka: str, visited=None):
-    # Используем множество, чтобы отслеживать уже обработанные узлы
-    if visited is None:
-        visited = set()
-
-    # Проверяем, не обрабатывали ли уже эту ветку
-    if vetka in visited:
-        return []  # Если уже обработана, возвращаем пустой список
-
-    visited.add(vetka)  # Помечаем текущую ветку как посещённую
-
-    # Создание массива зависимостей
+def svaz(slovs, vetka: str):
+    # создание массива зависимостей текущего к следующему
     deps = []
     p = 0
     if slovs[vetka][0]["whot"] != "commit (initial)":
         if "merge" in slovs[vetka][0]["whot"]:
             link = (slovs[vetka][0], slovs[vetka][1])
             deps.append(link)
-        for ii in svaz(slovs, slovs[vetka][0]["line"], visited):
+        # возможно ненужный код
+        for ii in svaz(slovs, slovs[vetka][0]["line"]):
             deps.append(ii)
-
     for i in range(p, len(slovs[vetka]) - 1):
         if slovs[vetka][i]["whot"] == "commit" or slovs[vetka][i]["whot"] == "commit (initial)":
             link = (slovs[vetka][i], slovs[vetka][i+1])
@@ -31,9 +21,9 @@ def svaz(slovs, vetka: str, visited=None):
                 link = (slovs[st][-1], slovs[vetka][i+1])
                 deps.append(link)
                 if len(slovs[st]) != 1:
-                    for ii in svaz(slovs, st, visited):
+                    for ii in svaz(slovs, st):
                         deps.append(ii)
-        if "rebase" in slovs[vetka][i+1]["whot"]:
+        if "rebase" in slovs[vetka][i]["whot"] or "merge" in slovs[vetka][i+1]["whot"]:
             link = (slovs[vetka][i], slovs[vetka][i+1])
             deps.append(link)
             if "merge" in slovs[vetka][i+1]["whot"]:
@@ -41,23 +31,21 @@ def svaz(slovs, vetka: str, visited=None):
                 link = (slovs[vetka][i+1], slovs[st][-1])
                 deps.append(link)
                 if len(slovs[st]) != 1:
-                    for ii in svaz(slovs, st, visited):
+                    for ii in svaz(slovs, st):
                         deps.append(ii)
-
     return deps
 
 
-
 def fetch_apk_dependencies(package_name: str, vetka: str):
-    """Получение зависимостей пакета из Alpine Linux."""
-    file_list = os.listdir(package_name + '/logs/refs/heads')
+    """Получение коммитов из файла гита HEAD"""
+    file_list = os.listdir(package_name + '\\logs\\refs\\heads')
     tekush = "master"
     prosh = ""
     slovs = {}
     for i in file_list:
         slovs[i] = []
-    head_file = package_name + '/logs/HEAD'
-    with open(head_file, 'r', encoding='utf-8') as log_file:
+    head_file = package_name + '\\logs\\HEAD'
+    with open(head_file, 'r') as log_file:
         for line in log_file:
             spl_line = line.split(" ")
             if spl_line[5][6:] == "commit":
@@ -79,8 +67,6 @@ def fetch_apk_dependencies(package_name: str, vetka: str):
                             slovs[tekush].append(i)
                         if slovs[tekush][0] == i:
                             p = 1
-
-    print(slovs)
     deps = svaz(slovs, vetka)
     return deps
 
@@ -91,7 +77,6 @@ def build_graphviz(deps):
     
     added_links = set()  
     # Создаём множество для хранения добавленных связей, чтобы избежать дублирования.
-
     for src, dest in deps:  
         # Проходим по каждой паре зависимостей (источник, назначение).
         
@@ -113,7 +98,6 @@ def build_graphviz(deps):
     return graphviz_code  # Возвращаем строку с кодом Graphviz.
 
 def main():
-    print(0)
     if len(sys.argv) != 5:  
         # Проверяем, что было передано ровно 4 аргумента: путь к программе для визуализации графов имя пакета и путь к файлу для записи результатов.
         
@@ -154,5 +138,5 @@ def main():
     # "dot" -Tsvg output.dot > output.svg
     os.system(f'\"{visializer_path}\" -Tsvg {output_path} > {output_path.split(".")[0] + ".svg"}')
 
-if __name__ == "__main__":
+if __name__ == "main":
     main() 
