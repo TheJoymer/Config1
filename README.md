@@ -50,7 +50,8 @@ import sys, os
 py zadan.py dot C:/Users/Bileb/Desktop/work/.git output.dot master
 # Результат работы
 ![изображение](https://github.com/user-attachments/assets/c17acc62-9d86-4b6e-b7de-8177c0c157cb)
-![изображение](https://github.com/user-attachments/assets/186ee585-ed5c-4c01-b286-53fdceb26605)
+![изображение](https://github.com/user-attachments/assets/a78a69a1-a43a-4c8a-8e30-cd08e16c16f8)
+
 
 
 
